@@ -1,0 +1,18 @@
+FROM centos:centos7
+
+ENV OPENVPN_VERSION=2.4.7
+ADD OpenVPN-obfs.patch ./
+
+RUN yum update -y
+RUN yum groupinstall 'Development tools' -y
+RUN yum install epel-release -y && yum-builddep -y openvpn
+RUN yum install -y wget net-tools
+RUN wget -O openvpn.tar.gz "https://swupdate.openvpn.org/community/releases/openvpn-${OPENVPN_VERSION}.tar.gz" && \
+    tar zxf openvpn.tar.gz && \
+    cd openvpn* && \
+    patch -p1 < ../OpenVPN-obfs.patch && \
+    autoreconf -f -i && \
+    ./configure && \
+	make -j$(nproc) && \
+	make install
+    

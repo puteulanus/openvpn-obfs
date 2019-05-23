@@ -1,0 +1,16 @@
+FROM centos:centos7
+
+ENV OPENVPN_VERSION=2.4.7
+ADD OpenVPN-obfs.patch /tmp/
+
+RUN yum update -y
+RUN yum groupinstall 'Development tools' -y
+RUN yum install epel-release yum-utils rpm-build -y && yum-builddep -y openvpn
+RUN yum install -y wget net-tools
+RUN yumdownloader --source openvpn && \
+    rpm -ivh openvpn*.rpm
+RUN cd /root/rpmbuild/SPECS && \
+    cp /tmp/OpenVPN-obfs.patch ../SOURCES/ && \
+    sed -i "/Patch50/a\Patch60: OpenVPN-obfs.patch" openvpn.spec && \
+    sed -i "/%patch50/a\%patch60 -p1" openvpn.spec && \
+    rpmbuild -ba openvpn.spec

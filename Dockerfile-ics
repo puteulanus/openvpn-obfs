@@ -1,0 +1,30 @@
+FROM ubuntu:18.04
+
+ENV OPENVPN_VERSION=2.4.7
+ADD OpenVPN-obfs.patch /tmp/
+
+RUN apt-get update && apt-get install -y software-properties-common
+RUN apt-get install -y build-essential
+RUN apt-get install -y unzip swig cmake wget git autoconf libtool openjdk-8-jdk 
+RUN wget -O /root/sdk-tools-linux.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip && \
+    cd /root/ && \
+    unzip sdk-tools-linux*.zip
+ENV PATH=$PATH:/root/tools/bin
+RUN yes | sdkmanager 'ndk-bundle' && \
+    yes | sdkmanager 'platforms;android-28'
+RUN git clone 'https://github.com/schwabe/ics-openvpn' && \
+    cd ics-openvpn && \
+    git submodule init && \
+    git submodule update
+RUN cd ics-openvpn/main/src/main/cpp && \
+    rm -rf openvpn && \
+    wget -O openvpn.tar.gz "https://swupdate.openvpn.org/community/releases/openvpn-${OPENVPN_VERSION}.tar.gz" && \
+    tar zxf openvpn.tar.gz && \
+    mv openvpn-2* openvpn && \
+    touch openvpn/src/openvpn/env_set.c openvpn/src/openvpn/run_command.c && \
+    cd openvpn && \
+    patch -p1 < /tmp/OpenVPN-obfs.patch && \
+    autoreconf -f -i
+RUN cd ics-openvpn && \
+    export ANDROID_HOME=/root/ && \
+    ./gradlew assembleNormalRelease
