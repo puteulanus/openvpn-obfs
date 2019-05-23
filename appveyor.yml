@@ -16,8 +16,8 @@ build_script:
   - docker run -v `pwd`/build_dir:/mnt/build_dir openvpn-obfs:win cp -r /openvpn-build/generic /mnt/build_dir/
   - docker run -v `pwd`/build_dir:/mnt/build_dir openvpn-obfs:ics cp -r /ics-openvpn/main/build/outputs/apk/normal/release/main-normal-release-unsigned.apk /mnt/build_dir/
   - cp build_dir/x86_64/openvpn-2*.rpm ./
-  - zip -r win32-bin.zip build_dir/generic/image-win32
-  - zip -r win64-bin.zip build_dir/generic/image-win64
+  - zip -rj win32-bin.zip build_dir/generic/image-win32/openvpn/bin
+  - zip -rj win64-bin.zip build_dir/generic/image-win64/openvpn/bin
   - cp build_dir/*.apk ./
 
 artifacts:
