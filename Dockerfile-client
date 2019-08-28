@@ -17,4 +17,5 @@ RUN wget -O openvpn.tar.gz "https://swupdate.openvpn.org/community/releases/open
 	make install
 
 VOLUME /etc/openvpn/client/
-CMD touch /etc/openvpn/client/client.ovpn && openvpn --cd /etc/openvpn/client --config client.ovpn --log-append log.txt
+CMD touch /etc/openvpn/client/client.ovpn && \
+	openvpn --cd /etc/openvpn/client --config client.ovpn --log-append log.txt --ifconfig-pool-persist ip.txt
