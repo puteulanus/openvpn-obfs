@@ -1,6 +1,6 @@
 FROM centos:centos7
 
-ENV OPENVPN_VERSION=2.4.7
+ENV OPENVPN_VERSION=2.4.8
 ADD OpenVPN-obfs.patch /tmp/
 
 RUN yum update -y
