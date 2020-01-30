@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-ENV OPENVPN_VERSION=2.4.7
+ENV OPENVPN_VERSION=2.4.8
 ADD OpenVPN-obfs.patch ./
 
 RUN apt-get update
