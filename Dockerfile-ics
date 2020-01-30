@@ -22,20 +22,10 @@ RUN cd ics-openvpn/main/src/main/cpp && \
     cd openvpn && \
     patch -p1 < /tmp/OpenVPN-obfs.patch && \
     autoreconf -f -i
-RUN <<EOF
-cat >> ics-openvpn/build.gradle.kts <<EOM
-allprojects {
-    tasks.withType<JavaCompile> {
-        options.compilerArgs.addAll(arrayOf("-Xlint:unchecked", "-Xlint:deprecation"))
-    }
-    tasks.whenTaskAdded {
-        if(name.contains("signing", ignoreCase = true)) {
-            enabled = false
-        }
-    }
-}
-EOM
-EOF
+RUN echo 'allprojects {' >> ics-openvpn/build.gradle.kts && \
+    echo 'tasks.withType<JavaCompile> { options.compilerArgs.addAll(arrayOf("-Xlint:unchecked", "-Xlint:deprecation")) }'"\n" >> ics-openvpn/build.gradle.kts && \
+    echo 'tasks.whenTaskAdded { if(name.contains("signing", ignoreCase = true)) { enabled = false }}'"\n" >> ics-openvpn/build.gradle.kts && \
+    echo '}' >> ics-openvpn/build.gradle.kts
 RUN cd ics-openvpn && \
     export ANDROID_HOME=/root/ && \
     ./gradlew assembleRelease
