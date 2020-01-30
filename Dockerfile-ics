@@ -1,6 +1,5 @@
 FROM ubuntu:18.04
 
-ENV OPENVPN_VERSION=2.4.8
 ADD OpenVPN-obfs.patch /tmp/
 
 RUN apt-get update && apt-get install -y software-properties-common
@@ -18,13 +17,25 @@ RUN git clone 'https://github.com/schwabe/ics-openvpn' && \
     git submodule update
 RUN cd ics-openvpn/main/src/main/cpp && \
     rm -rf openvpn && \
-    wget -O openvpn.tar.gz "https://swupdate.openvpn.org/community/releases/openvpn-${OPENVPN_VERSION}.tar.gz" && \
-    tar zxf openvpn.tar.gz && \
-    mv openvpn-2* openvpn && \
-    touch openvpn/src/openvpn/env_set.c openvpn/src/openvpn/run_command.c && \
+    git clone https://github.com/OpenVPN/openvpn openvpn && \
+    touch openvpn/src/openvpn/ssl_ncp.c && \
     cd openvpn && \
     patch -p1 < /tmp/OpenVPN-obfs.patch && \
     autoreconf -f -i
+RUN <<EOF
+cat >> ics-openvpn/build.gradle.kts <<EOM
+allprojects {
+    tasks.withType<JavaCompile> {
+        options.compilerArgs.addAll(arrayOf("-Xlint:unchecked", "-Xlint:deprecation"))
+    }
+    tasks.whenTaskAdded {
+        if(name.contains("signing", ignoreCase = true)) {
+            enabled = false
+        }
+    }
+}
+EOM
+EOF
 RUN cd ics-openvpn && \
     export ANDROID_HOME=/root/ && \
-    ./gradlew assembleNormalRelease
+    ./gradlew assembleRelease
