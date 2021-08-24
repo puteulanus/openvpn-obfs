@@ -11,8 +11,8 @@ build_script:
   - docker build -t openvpn-obfs:rpm . -f Dockerfile-rpm
   - docker build -t openvpn-obfs:win . -f Dockerfile-win
   - mkdir build_dir
-  - docker run -v `pwd`/build_dir:/mnt/build_dir openvpn-obfs:rpm cp -r /root/rpmbuild/RPMS/x86_64  /mnt/build_dir/
-  - docker run -v `pwd`/build_dir:/mnt/build_dir openvpn-obfs:win cp -r /openvpn-build/generic /mnt/build_dir/
+  - docker run --rm --user $(id -u):$(id -g) -v `pwd`/build_dir:/mnt/build_dir openvpn-obfs:rpm cp -r /root/rpmbuild/RPMS/x86_64  /mnt/build_dir/
+  - docker run --rm --user $(id -u):$(id -g) -v `pwd`/build_dir:/mnt/build_dir openvpn-obfs:win cp -r /openvpn-build/generic /mnt/build_dir/
   - cp build_dir/x86_64/openvpn-2*.rpm ./
   - zip -rj win32-bin.zip build_dir/generic/image-win32/openvpn/bin
   - zip -rj win64-bin.zip build_dir/generic/image-win64/openvpn/bin
