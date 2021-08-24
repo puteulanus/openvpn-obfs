@@ -16,6 +16,7 @@ build_script:
   - cp build_dir/x86_64/openvpn-2*.rpm ./
   - zip -rj win32-bin.zip build_dir/generic/image-win32/openvpn/bin
   - zip -rj win64-bin.zip build_dir/generic/image-win64/openvpn/bin
+  - rm -rf build_dir
 
 artifacts:
   - path: '*.rpm'
